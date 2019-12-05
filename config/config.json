@@ -1,0 +1,12 @@
+{
+  "development": {
+    "username": "parish-manager-admin",
+    "password": "Test1234$",
+    "database": "parish-manager",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL"
+  }
+}
