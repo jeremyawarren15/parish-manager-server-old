@@ -1,6 +1,6 @@
 /* eslint-disable object-curly-newline */
 const graphql = require("graphql");
-const { Hour } = require("../models");
+const { Hour, User } = require("../models");
 
 // Not meant to be a final method. Should be deleted after implementing database.
 const getTimeString = hour => {
@@ -65,16 +65,36 @@ const HourType = new GraphQLObjectType({
   })
 });
 
+const UserType = new GraphQLObjectType({
+  name: "User",
+  fields: () => ({
+    id: { type: GraphQLID },
+    firstName: { type: GraphQLString },
+    lastName: { type: GraphQLString },
+    email: { type: GraphQLString },
+    phoneNumber: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
+    updatedAt: { type: GraphQLString }
+  })
+});
+
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     hour: {
       type: HourType,
       args: { id: { type: GraphQLID } },
-      resolve(parent, args) {
-        const hour = Hour.findOne({ where: { id: args.id } });
+      async resolve(parent, args) {
+        const hour = await Hour.findOne({ where: { id: args.id } });
 
         return addCalculatedFields(hour);
+      }
+    },
+    user: {
+      type: UserType,
+      args: { id: { type: GraphQLID } },
+      async resolve(parent, args) {
+        return await User.findOne({ where: { id: args.id } });
       }
     },
     hours: {
@@ -97,6 +117,12 @@ const RootQuery = new GraphQLObjectType({
           return dbHours;
         });
         return hours;
+      }
+    },
+    users: {
+      type: new GraphQLList(UserType),
+      async resolve(parent, args) {
+        return await User.findAll();
       }
     }
   }
@@ -125,6 +151,25 @@ const Mutation = new GraphQLObjectType({
         newHour.committedAdorers = 0;
 
         return addCalculatedFields(newHour);
+      }
+    },
+    create_user: {
+      type: UserType,
+      args: {
+        firstName: { type: GraphQLString },
+        lastName: { type: GraphQLString },
+        email: { type: GraphQLString },
+        phoneNumber: { type: GraphQLString }
+      },
+      async resolve(parent, { firstName, lastName, email, phoneNumber }) {
+        let newUser = await User.create({
+          firstName,
+          lastName,
+          email,
+          phoneNumber
+        });
+
+        return newUser;
       }
     }
   }
