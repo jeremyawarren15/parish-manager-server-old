@@ -8,7 +8,11 @@ You should now be ready to move to the next step.
 
 ## Setting up the Database
 
-The Postgres database has not been set up. Details are coming soon.
+We are using Postgres for this database. To run this locally you will need to install [Postgres](https://www.postgresql.org/download/). You will need to add a user in pgAdmin that match the details in the config file in `config/config.json`.
+
+You can run the migrations by running the command `npm run build`. This will run the migrator using the sequelize cli. This is assigned to the build command because build is run every time there is a deployment to Heroku so it was a convenient time to also perform the database migrations.
+
+There is no need to create a new data model manually. If you use the sequelize cli it will make the model and migration in one command. You can find more information about how to use that [here](https://sequelize.org/master/manual/migrations.html). Since I have installed the cli as a dev dependency there is no need to use npx sequelize-cli. You can access the cli by running `.\\node_modules\\.bin\\sequelize` instead of `npx sequelize-cli`. Using npx is kind of like a one-off use kind of thing. Other than that, there is no difference.
 
 ## Running the Development Server
 
