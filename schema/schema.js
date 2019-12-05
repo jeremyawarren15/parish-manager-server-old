@@ -45,7 +45,8 @@ const {
   GraphQLInt,
   GraphQLSchema,
   GraphQLID,
-  GraphQLList
+  GraphQLList,
+  GraphQLBoolean
 } = graphql;
 
 const HourType = new GraphQLObjectType({
@@ -78,8 +79,16 @@ const RootQuery = new GraphQLObjectType({
     },
     hours: {
       type: new GraphQLList(HourType),
-      async resolve(parent, args) {
-        const hours = await Hour.findAll().then(dbHours => {
+      args: { sortByDay: { type: GraphQLBoolean } },
+      async resolve(parent, { sortByDay }) {
+        const hours = await Hour.findAll(
+          sortByDay && {
+            order: [
+              ["day", "ASC"],
+              ["time", "ASC"]
+            ]
+          }
+        ).then(dbHours => {
           dbHours.map(hour => {
             let modHour = addCalculatedFields(hour);
             modHour.committedAdorers = 0;
@@ -104,9 +113,7 @@ const Mutation = new GraphQLObjectType({
         location: { type: GraphQLString },
         requiredNumberOfAdorers: { type: GraphQLInt }
       },
-      async resolve(parent, args) {
-        const { day, time, location, requiredNumberOfAdorers } = args;
-
+      async resolve(parent, { day, time, location, requiredNumberOfAdorers }) {
         let newHour = await Hour.create({
           day,
           time,
