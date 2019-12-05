@@ -4,6 +4,9 @@ const { Hour } = require("../models");
 
 // Not meant to be a final method. Should be deleted after implementing database.
 const getTimeString = hour => {
+  if (hour > 23 || hour < 0) return "Invalid time";
+  if (hour === 0) return "12PM-1AM";
+  if (hour === 12) return "12AM-1PM";
   const isAfternoon = hour > 10;
   const newHour = isAfternoon ? hour - 12 : hour;
   return `${newHour}-${newHour + 1}${isAfternoon ? "PM" : "AM"}`;
@@ -82,10 +85,8 @@ const RootQuery = new GraphQLObjectType({
             modHour.committedAdorers = 0;
             return modHour;
           });
-
           return dbHours;
         });
-
         return hours;
       }
     }
@@ -104,11 +105,13 @@ const Mutation = new GraphQLObjectType({
         requiredNumberOfAdorers: { type: GraphQLInt }
       },
       async resolve(parent, args) {
+        const { day, time, location, requiredNumberOfAdorers } = args;
+
         let newHour = await Hour.create({
-          day: args.day,
-          time: args.time,
-          location: args.location,
-          requiredNumberOfAdorers: args.requiredNumberOfAdorers
+          day,
+          time,
+          location,
+          requiredNumberOfAdorers
         });
 
         // Going to have to update the schema after adding Users
