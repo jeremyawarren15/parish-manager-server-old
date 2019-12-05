@@ -1,6 +1,6 @@
 /* eslint-disable object-curly-newline */
 const graphql = require("graphql");
-const { Hour, User } = require("../models");
+const { Hour, User, UserHours } = require("../models");
 
 // Not meant to be a final method. Should be deleted after implementing database.
 const getTimeString = hour => {
@@ -36,6 +36,7 @@ const getDayString = day => {
 const addCalculatedFields = hour => {
   hour.dayString = getDayString(hour.day);
   hour.timeString = getTimeString(hour.time);
+  hour.committedAdorers = 0;
   return hour;
 };
 
@@ -52,7 +53,7 @@ const {
 const HourType = new GraphQLObjectType({
   name: "Hour",
   fields: () => ({
-    id: { type: GraphQLID },
+    id: { type: GraphQLInt },
     time: { type: GraphQLInt },
     timeString: { type: GraphQLString },
     day: { type: GraphQLInt },
@@ -68,11 +69,33 @@ const HourType = new GraphQLObjectType({
 const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
-    id: { type: GraphQLID },
+    id: { type: GraphQLInt },
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
     email: { type: GraphQLString },
     phoneNumber: { type: GraphQLString },
+    createdAt: { type: GraphQLString },
+    updatedAt: { type: GraphQLString },
+    hours: {
+      type: new GraphQLList(HourType),
+      async resolve(parent, args) {
+        const id = parent.id;
+        const user = await User.findOne({ where: { id } });
+        const hours = await user.getHours();
+        return hours.map(x => {
+          return addCalculatedFields(x.dataValues);
+        });
+      }
+    }
+  })
+});
+
+const UserHoursType = new GraphQLObjectType({
+  name: "UserHoursType",
+  fields: () => ({
+    id: { type: GraphQLInt },
+    hourId: { type: GraphQLInt },
+    userId: { type: GraphQLInt },
     createdAt: { type: GraphQLString },
     updatedAt: { type: GraphQLString }
   })
@@ -83,10 +106,9 @@ const RootQuery = new GraphQLObjectType({
   fields: {
     hour: {
       type: HourType,
-      args: { id: { type: GraphQLID } },
+      args: { id: { type: GraphQLInt } },
       async resolve(parent, args) {
         const hour = await Hour.findOne({ where: { id: args.id } });
-
         return addCalculatedFields(hour);
       }
     },
@@ -170,6 +192,16 @@ const Mutation = new GraphQLObjectType({
         });
 
         return newUser;
+      }
+    },
+    add_user_to_hour: {
+      type: UserHoursType,
+      args: {
+        hourId: { type: GraphQLID },
+        userId: { type: GraphQLID }
+      },
+      async resolve(parent, { hourId, userId }) {
+        return await UserHours.create({ hourId, userId });
       }
     }
   }

@@ -24,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = function(models) {
     User.belongsToMany(models.Hour, {
-      through: "UserHours"
+      through: "UserHours",
+      foreignKey: "userId"
     });
   };
 
