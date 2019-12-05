@@ -10,5 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
 
+  Hour.associate = function(models) {
+    Hour.belongsToMany(models.User, {
+      through: "UserHours"
+    });
+  };
+
   return Hour;
 };
