@@ -78,7 +78,7 @@ const UserType = new GraphQLObjectType({
     updatedAt: { type: GraphQLString },
     hours: {
       type: new GraphQLList(HourType),
-      async resolve(parent, args) {
+      async resolve(parent) {
         const id = parent.id;
         const user = await User.findOne({ where: { id } });
         const hours = await user.getHours();
@@ -143,7 +143,7 @@ const RootQuery = new GraphQLObjectType({
     },
     users: {
       type: new GraphQLList(UserType),
-      async resolve(parent, args) {
+      async resolve() {
         return await User.findAll();
       }
     }
