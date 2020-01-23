@@ -1,22 +1,9 @@
-/* eslint-disable no-console */
-const express = require("express");
-const graphqlHTTP = require("express-graphql");
-const cors = require("cors");
-const schema = require("./schema/schema");
+const { ApolloServer } = require("apollo-server");
+const typeDefs = require("./typedefs");
+const resolvers = require("./resolvers");
 
-const PORT = process.env.PORT || 4000;
+const server = new ApolloServer({ typeDefs, resolvers });
 
-const app = express();
-
-// Configure Server
-app.use(cors());
-
-app.use(
-  "/graphql",
-  graphqlHTTP({
-    schema,
-    graphiql: true
-  })
-);
-
-app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
+server.listen().then(({ url }) => {
+  console.log(`🚀  Server ready at ${url}`);
+});
