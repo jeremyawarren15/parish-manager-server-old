@@ -3,7 +3,7 @@ const typeDefs = require("./typedefs");
 const resolvers = require("./resolvers");
 
 const server = new ApolloServer({
-  cors: { origin: "*", credentials: true },
+  cors: true,
   typeDefs,
   resolvers
 });
