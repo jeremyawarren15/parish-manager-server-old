@@ -26,9 +26,23 @@ const typeDefs = gql`
     updatedAt: String
   }
 
+  type UserAggregates {
+    totalCount: Int
+  }
+
   type Query {
-    hours(sortByDay: Boolean!): [Hour]
-    users: [User]
+    hours(sortByDay: Boolean): [Hour]
+    users(cursor: Int): [User]
+    userAggregates: UserAggregates
+  }
+
+  type Mutation {
+    addUser(
+      firstName: String!
+      lastName: String!
+      email: String!
+      phoneNumber: String
+    ): User
   }
 `;
 
