@@ -43,6 +43,12 @@ const typeDefs = gql`
       email: String!
       phoneNumber: String
     ): User
+    addHour(
+      time: Int
+      day: Int
+      location: String
+      requiredNumberOfAdorers: Int
+    ): Hour
   }
 `;
 
