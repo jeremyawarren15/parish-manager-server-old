@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const bcrypt = require("bcrypt");
 const Op = Sequelize.Op;
 const { User, Hour } = require("../models");
 const { GetAllHours, GetHoursFromParent } = require("./hourResolvers");
@@ -30,13 +31,45 @@ const resolvers = {
         totalCount: await User.count(),
       };
     },
+    login: async (parent, { email, password }) => {
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        throw new Error("Credentials are incorrect.");
+      }
+
+      const isCorrectPassword = await bcrypt.compare(password, user.password);
+      if (!isCorrectPassword) {
+        throw new Error("Credentials are incorrect.");
+      }
+
+      return user;
+    },
   },
   Mutation: {
-    addUser: (_, { firstName, lastName, email, phoneNumber }) => {
-      return User.create({ firstName, lastName, email, phoneNumber });
+    createUser: async (
+      parent,
+      { email, password, firstName, lastName, phoneNumber }
+    ) => {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        throw new Error("User already exists.");
+      }
+      const hashedPassword = await bcrypt.hash(password, 12);
+      return await User.create({
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phoneNumber,
+      });
     },
-    addHour: (_, { time, day, location, requiredNumberOfAdorers }) => {
-      return Hour.create({ time, day, location, requiredNumberOfAdorers });
+    addHour: async (_, { time, day, location, requiredNumberOfAdorers }) => {
+      return await Hour.create({
+        time,
+        day,
+        location,
+        requiredNumberOfAdorers,
+      });
     },
   },
 };

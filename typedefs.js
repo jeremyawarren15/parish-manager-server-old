@@ -34,14 +34,16 @@ const typeDefs = gql`
     hours(sortByDay: Boolean): [Hour]
     users(cursor: Int): [User]
     userAggregates: UserAggregates
+    login(email: String!, password: String!): User!
   }
 
   type Mutation {
-    addUser(
+    createUser(
+      email: String!
+      password: String!
       firstName: String!
       lastName: String!
-      email: String!
-      phoneNumber: String
+      phoneNumber: String!
     ): User
     addHour(
       time: Int

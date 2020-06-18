@@ -5,19 +5,23 @@ module.exports = (sequelize, DataTypes) => {
     {
       firstName: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
       },
       lastName: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
       },
       email: {
         allowNull: false,
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+      },
+      password: {
+        allowNull: false,
+        type: DataTypes.STRING,
       },
       phoneNumber: {
-        type: DataTypes.STRING
-      }
+        type: DataTypes.STRING,
+      },
     },
     {}
   );
@@ -25,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function(models) {
     User.belongsToMany(models.Hour, {
       through: "UserHours",
-      foreignKey: "userId"
+      foreignKey: "userId",
     });
   };
 
