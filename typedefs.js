@@ -26,6 +26,12 @@ const typeDefs = gql`
     updatedAt: String
   }
 
+  type AuthData {
+    userId: String!
+    token: String!
+    tokenExpiration: Int!
+  }
+
   type UserAggregates {
     totalCount: Int
   }
@@ -34,7 +40,7 @@ const typeDefs = gql`
     hours(sortByDay: Boolean): [Hour]
     users(cursor: Int): [User]
     userAggregates: UserAggregates
-    login(email: String!, password: String!): User!
+    login(email: String!, password: String!): AuthData!
   }
 
   type Mutation {

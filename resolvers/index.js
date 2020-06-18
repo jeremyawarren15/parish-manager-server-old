@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const Op = Sequelize.Op;
 const { User, Hour } = require("../models");
 const { GetAllHours, GetHoursFromParent } = require("./hourResolvers");
@@ -42,7 +43,18 @@ const resolvers = {
         throw new Error("Credentials are incorrect.");
       }
 
-      return user;
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+        "key",
+        { expiresIn: "1h" }
+      );
+
+      return { userId: user.id, token, tokenExpiration: 1 };
     },
   },
   Mutation: {
