@@ -4,9 +4,11 @@
     "password": "Test1234$",
     "database": "parish-manager",
     "host": "localhost",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "jsonWebTokenKey": "superSecretKey"
   },
   "production": {
-    "use_env_variable": "DATABASE_URL"
+    "use_env_variable": "DATABASE_URL",
+    "jsonWebTokenKey": "JSON_WEB_TOKEN_KEY"
   }
 }

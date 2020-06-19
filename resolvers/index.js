@@ -5,18 +5,39 @@ const Op = Sequelize.Op;
 const { User, Hour } = require("../models");
 const { GetAllHours, GetHoursFromParent } = require("./hourResolvers");
 
+const env = process.env.NODE_ENV || "development";
+const config = require("../config/config.json")[env];
+
 const resolvers = {
   Hour: {
-    users: async (parent) => await parent.getUsers(),
+    users: async (parent, args, { isAuth }) => {
+      if (!isAuth) {
+        throw new Error("Not Authenticated");
+      }
+      await parent.getUsers();
+    },
   },
   User: {
-    hours: async (parent, args, context, info) =>
-      await GetHoursFromParent(parent, args, context, info),
+    hours: async (parent, args, context, info) => {
+      if (!context.isAuth) {
+        throw new Error("Not Authenticated");
+      }
+      await GetHoursFromParent(parent, args, context, info);
+    },
   },
   Query: {
-    hours: async (parent, args, context, info) =>
-      await GetAllHours(parent, args, context, info),
-    users: async (parent, args) => {
+    hours: async (parent, args, context, info) => {
+      if (!context.isAuth) {
+        throw new Error("Not Authenticated");
+      }
+
+      await GetAllHours(parent, args, context, info);
+    },
+    users: async (parent, args, { isAuth }) => {
+      if (!isAuth) {
+        throw new Error("Not Authenticated");
+      }
+
       const cursor = args.cursor || 0;
       return await User.findAll({
         limit: 10,
@@ -47,10 +68,8 @@ const resolvers = {
         {
           userId: user.id,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
         },
-        "key",
+        config.jsonWebTokenKey,
         { expiresIn: "1h" }
       );
 

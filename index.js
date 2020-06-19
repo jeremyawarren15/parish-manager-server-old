@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("./middleware/auth");
 const { ApolloServer } = require("apollo-server-express");
 const typeDefs = require("./typedefs");
 const resolvers = require("./resolvers");
@@ -11,6 +12,21 @@ app.use(cors());
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ req }) => {
+    var result = auth(req);
+    if (result === false) {
+      // if authentication failed just set isAuth to false
+      return {
+        isAuth: false,
+      };
+    }
+
+    // if authentication succeeded then set isAuth and currentUser
+    return {
+      isAuth: true,
+      currentUser: result.userId,
+    };
+  },
 });
 
 server.applyMiddleware({ app });
