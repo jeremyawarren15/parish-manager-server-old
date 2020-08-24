@@ -11,7 +11,25 @@ const app = express();
 
 app.use(cors());
 
+const GRAPHQL_PLAYGROUND_CONFIG = {
+  settings: {
+    "editor.cursorShape": "line",
+    "editor.fontSize": 14,
+    "editor.reuseHeaders": true,
+    "editor.theme": "dark",
+  },
+};
+
 const enableGraphiql = () => {
+  if (env === "development") return GRAPHQL_PLAYGROUND_CONFIG;
+  if (config.show_graphiql) {
+    const configVal = process.env[config.show_graphiql];
+    if (configVal === "true") return GRAPHQL_PLAYGROUND_CONFIG;
+  }
+  return false;
+};
+
+const enableIntrospection = () => {
   if (env === "development") return true;
   if (config.show_graphiql) {
     const configVal = process.env[config.show_graphiql];
@@ -22,7 +40,7 @@ const enableGraphiql = () => {
 
 const server = new ApolloServer({
   playground: enableGraphiql(),
-  introspection: enableGraphiql(),
+  introspection: enableIntrospection(),
   typeDefs,
   resolvers,
   context: ({ req }) => {
