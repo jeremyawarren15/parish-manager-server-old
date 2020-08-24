@@ -5,10 +5,12 @@
     "database": "parish-manager",
     "host": "localhost",
     "dialect": "postgres",
-    "jsonWebTokenKey": "superSecretKey"
+    "jsonWebTokenKey": "superSecretKey",
+    "show_graphiql": true
   },
   "production": {
     "use_env_variable": "DATABASE_URL",
-    "jsonWebTokenKey": "JSON_WEB_TOKEN_KEY"
+    "jsonWebTokenKey": "JSON_WEB_TOKEN_KEY",
+    "show_graqhiql": "SHOW_GRAPHIQL"
   }
 }

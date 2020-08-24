@@ -3,13 +3,21 @@ const auth = require("./middleware/auth");
 const { ApolloServer } = require("apollo-server-express");
 const typeDefs = require("./typedefs");
 const resolvers = require("./resolvers");
+const env = process.env.NODE_ENV || "development";
+const config = require("./config/config.json")[env];
 const cors = require("cors");
 
 const app = express();
 
 app.use(cors());
 
+const enableGraphiql = () => {
+  return config.show_graphiql === "true" || config.show_graphiql === true;
+};
+
 const server = new ApolloServer({
+  playground: enableGraphiql,
+  introspection: enableGraphiql,
   typeDefs,
   resolvers,
   context: ({ req }) => {
