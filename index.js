@@ -12,13 +12,17 @@ const app = express();
 app.use(cors());
 
 const enableGraphiql = () => {
-  const configVal = process.env[config.show_graphiql];
-  return configVal === "true" || configVal === true;
+  if (env === "development") return true;
+  if (config.show_graphiql) {
+    const configVal = process.env[config.show_graphiql];
+    return configVal === "true";
+  }
+  return false;
 };
 
 const server = new ApolloServer({
-  playground: enableGraphiql,
-  introspection: enableGraphiql,
+  playground: enableGraphiql(),
+  introspection: enableGraphiql(),
   typeDefs,
   resolvers,
   context: ({ req }) => {
