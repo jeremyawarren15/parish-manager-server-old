@@ -1,3 +1,7 @@
+# This code is no longer in active development
+
+I have restarted this project several times and I got to a point where this solution wasn't working out for me, for various reasons. So I have decided to move the next iteration to a separate repo.
+
 ## Running for the First Time
 
 In order to run the server for this project you will have to have the most recent version of [Node.js](https://nodejs.org/en/) installed.
